@@ -88,15 +88,18 @@ summary(m4)
 bac$BMI <- bac$weight / (bac$height/100)^2
 m_bmi <- lm(beta60 ~ sex + BMI, data=bac)
 summary(m_bmi)
+
+m_weight <- lm(beta60 ~ sex + weight, data=bac)
+summary(m_weight)
+
+m_interact1 <- lm(beta60 ~ sex * weight, data=bac)
+summary(m_interact1)
+
+m_interact2 <- lm(beta60 ~ sex * height, data=bac)
+summary(m_interact2)
 ```
 
-```{r}
-anova(m1, m3)
-anova(m2, m3)
-
-AIC(m1, m2, m3, m4)
-```
-
+Including both weight and height, we get multicollinearity. Models explain only 15-22% of variation. Sex is partially confounded by height as including sex and body dimensions reduces effect of sex. Still, males eliminate alcohol slower than females. 
 
 ```{r}
 set.seed(1)
