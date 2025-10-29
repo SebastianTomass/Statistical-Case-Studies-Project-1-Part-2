@@ -8,7 +8,7 @@ date: "2025-10-29"
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
 library(boot)
-library(quantreg)
+library(effectsize)
 ```
 
 ```{r}
@@ -45,14 +45,57 @@ ggplot(bac, aes(beta60)) +
 ```
 
 ```{r}
-q02_5 <- bac %>% 
-  summarise(quantile(beta60, 0.025))
+quantile(bac$beta60, c(0.025, 0.975))
+summary(bac$beta60)
+sd(bac$beta60)
+```
 
-q02_5
+
+```{r}
+# Boxplot
+boxplot(beta60 ~ sex, data=bac)
+
+# T-test or Wilcoxon test
+t.test(beta60 ~ sex, data=bac)
+
+# Effect size
+cohens_d(beta60 ~ sex, data=bac)
 ```
 
 ```{r}
-set.seed(123)
+library(corrplot)
+vars <- c("beta60", "sex_numeric", "weight", "height", "age")
+bac$sex_numeric <- ifelse(bac$sex == "male", 1, 0)
+cor_matrix <- cor(bac[, vars], use="complete.obs")
+corrplot(cor_matrix, method="number")
+```
+
+sex is a potential confounding factor. 
+
+```{r}
+m1 <- lm(beta60 ~ sex, data=bac)
+summary(m1)
+
+m2 <- lm(beta60 ~ weight + height, data=bac)
+summary(m2)
+
+m3 <- lm(beta60 ~ sex + weight + height, data=bac)
+summary(m3)
+
+m4 <- lm(beta60 ~ sex + weight + height + age, data=bac)
+summary(m4)
+```
+
+```{r}
+anova(m1, m3)
+anova(m2, m3)
+
+AIC(m1, m2, m3, m4)
+```
+
+
+```{r}
+set.seed(1)
 bootstrap <- function(d, idx) quantile(d$beta60[idx], 0.025, na.rm = TRUE)
 bootstrap_run <- boot(data = bac, statistic = bootstrap, R = 5000)
 beta_q025_ci <- quantile(bootstrap_run$t, c(0.025, 0.5, 0.975), na.rm = TRUE)
@@ -63,19 +106,4 @@ beta_q025_ci
 The bootstrap CI shows how much the 2.5 percentile moves from sampling noise. Here the interval is fairly tight, so the rule is not wildly unstable on this sample.  
 
 **Could create back calculation function??**
-
-```{r}
-ggplot(bac, aes(x = age, y = beta60)) +
-  geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE, linetype = 2) +              
-  stat_quantile(quantiles = 0.025, method = "rq", formula = y ~ x,    
-                linewidth = 1, color = "red") +
-  geom_rug(alpha = 0.2) +
-  labs(x = "Age (years)",
-       y = expression(beta~"(g/kg/h)"),
-       title = "Age vs elimination rate β",
-       subtitle = "linear (dashed), 2.5th-quantile line (red)") +
-  theme_minimal()
-
-```
 
