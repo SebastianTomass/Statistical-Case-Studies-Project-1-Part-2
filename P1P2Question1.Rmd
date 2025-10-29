@@ -65,57 +65,6 @@ The bootstrap CI shows how much the 2.5 percentile moves from sampling noise. He
 **Could create back calculation function??**
 
 ```{r}
-if ("sex" %in% names(bac)) {
-  bac <- bac %>% mutate(sex = factor(tolower(sex)))
-  beta_by_sex <- bac %>% group_by(sex) %>%
-    summarise(n = n(), q02_5 = quantile(beta60, 0.025),
-              q50 = quantile(beta60, 0.50), q97_5 = quantile(beta60, 0.975),
-              .groups = "drop")
-  beta_by_sex
-}
-```
-
-```{r}
-set.seed(1)
-boot_diff <- function(d, idx) {
-  x <- d[idx, ]
-  q_m <- quantile(x$beta60[x$sex == "male"],   0.025, na.rm = TRUE)
-  q_f <- quantile(x$beta60[x$sex == "female"], 0.025, na.rm = TRUE)
-  q_f - q_m
-}
-
-b <- boot(bac, statistic = boot_diff, R = 5000)
-diff_ci <- quantile(b$t, c(0.025, 0.5, 0.975), na.rm = TRUE)
-names(diff_ci) <- c("ci_low","point_est","ci_high")
-diff_ci
-```
-
-Since CI is above 0, the 2.5th percentile for females is credibly higher, suggesting that sex matters. 
-
-```{r}
-fit_age    <- rq(beta60 ~ age, tau = 0.025, data = bac)
-fit_weight <- rq(beta60 ~ weight, tau = 0.025, data = bac)
-fit_height <- rq(beta60 ~ height, tau = 0.025, data = bac)
-fit_mult   <- rq(beta60 ~ sex + age + weight + height, tau = 0.025, data = bac)
-
-set.seed(2025)
-s1 <- summary(fit_age, se = "boot", R = 5000, bsmethod = "xy") 
-s1
-
-s2 <- summary(fit_weight, se = "boot", R = 5000, bsmethod = "xy") 
-s2
-
-s3 <- summary(fit_height, se = "boot", R = 5000, bsmethod = "xy") 
-s3
-
-s4 <- summary(fit_mult, se = "boot", R = 5000, bsmethod = "xy") 
-s4
-
-```
-
-Regression at the 2.5 percentile shows age being significant. Older age predicts a larger Beta. Weight and Height are not significant. Sex is also not significant, indicating our earlier bootstrap analysis did not take into account confounding factors (age). 
-
-```{r}
 ggplot(bac, aes(x = age, y = beta60)) +
   geom_point(alpha = 0.5) +
   geom_smooth(method = "lm", se = FALSE, linetype = 2) +              
@@ -128,27 +77,5 @@ ggplot(bac, aes(x = age, y = beta60)) +
        subtitle = "linear (dashed), 2.5th-quantile line (red)") +
   theme_minimal()
 
-```
-
-
-```{r}
-boot_q025 <- function(x, R=3000){
-  b <- boot(x, function(d,i) quantile(d[i],0.025,na.rm=TRUE), R=R)
-  setNames(as.numeric(quantile(b$t,c(.025,.5,.975),na.rm=TRUE)),
-           c("ci_low","point_est","ci_high"))
-}
-
-age_tail <- bac %>%
-  mutate(age_q = ntile(age, 4)) %>%
-  group_by(age_q) %>%
-  summarise(n=n(),
-            age_min=min(age), age_max=max(age),
-            q02_5=quantile(beta60,0.025),
-            ci=list(boot_q025(beta60)), .groups="drop") %>%
-  unnest_wider(ci) %>%
-  mutate(bin=sprintf("[%d–%d]", round(age_min), round(age_max))) %>%
-  select(bin, n, q02_5, ci_low, point_est, ci_high)
-
-age_tail
 ```
 
