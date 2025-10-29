@@ -50,18 +50,6 @@ summary(bac$beta60)
 sd(bac$beta60)
 ```
 
-
-```{r}
-# Boxplot
-boxplot(beta60 ~ sex, data=bac)
-
-# T-test or Wilcoxon test
-t.test(beta60 ~ sex, data=bac)
-
-# Effect size
-cohens_d(beta60 ~ sex, data=bac)
-```
-
 ```{r}
 library(corrplot)
 vars <- c("beta60", "sex_numeric", "weight", "height", "age")
@@ -99,7 +87,21 @@ m_interact2 <- lm(beta60 ~ sex * height, data=bac)
 summary(m_interact2)
 ```
 
-Including both weight and height, we get multicollinearity. Models explain only 15-22% of variation. Sex is partially confounded by height as including sex and body dimensions reduces effect of sex. Still, males eliminate alcohol slower than females. 
+Including both weight and height, we get multicollinearity. Models explain only 15-22% of variation. Sex is partially confounded by height as including sex and body dimensions reduces effect of sex. Still, males eliminate alcohol slower than females. Taller people eliminate alcohol faster. 
+
+```{r}
+# Boxplot
+boxplot(beta60 ~ sex, data=bac)
+
+# T-test or Wilcoxon test
+t.test(beta60 ~ sex, data=bac)
+
+# Effect size
+cohens_d(beta60 ~ sex, data=bac)
+```
+
+
+
 
 ```{r}
 set.seed(1)
@@ -110,7 +112,7 @@ names(beta_q025_ci) <- c("ci_low","point_estimate","ci_high")
 beta_q025_ci
 ```
 
-The bootstrap CI shows how much the 2.5 percentile moves from sampling noise. Here the interval is fairly tight, so the rule is not wildly unstable on this sample.  
+The bootstrap CI shows how much the 2.5 percentile moves from sampling noise. Here the interval is fairly tight, so the rule is not unstable on this sample.  
 
 **Could create back calculation function??**
 
