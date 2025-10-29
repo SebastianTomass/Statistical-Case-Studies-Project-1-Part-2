@@ -84,6 +84,10 @@ summary(m3)
 
 m4 <- lm(beta60 ~ sex + weight + height + age, data=bac)
 summary(m4)
+
+bac$BMI <- bac$weight / (bac$height/100)^2
+m_bmi <- lm(beta60 ~ sex + BMI, data=bac)
+summary(m_bmi)
 ```
 
 ```{r}
