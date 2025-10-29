@@ -118,14 +118,14 @@ Regression at the 2.5 percentile shows age being significant. Older age predicts
 ```{r}
 ggplot(bac, aes(x = age, y = beta60)) +
   geom_point(alpha = 0.5) +
-  geom_smooth(method = "lm", se = FALSE, linetype = 2) +              # linear trend
-  stat_quantile(quantiles = 0.025, method = "rq", formula = y ~ x,    # τ = 0.025 tail
+  geom_smooth(method = "lm", se = FALSE, linetype = 2) +              
+  stat_quantile(quantiles = 0.025, method = "rq", formula = y ~ x,    
                 linewidth = 1, color = "red") +
   geom_rug(alpha = 0.2) +
   labs(x = "Age (years)",
        y = expression(beta~"(g/kg/h)"),
        title = "Age vs elimination rate β",
-       subtitle = "Dots = observations; linear (dashed), 2.5th-quantile line (red)") +
+       subtitle = "linear (dashed), 2.5th-quantile line (red)") +
   theme_minimal()
 
 ```
