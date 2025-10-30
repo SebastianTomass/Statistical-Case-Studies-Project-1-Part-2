@@ -94,7 +94,7 @@ m_interact2 <- lm(beta60 ~ sex * height, data=bac)
 summary(m_interact2)
 ```
 
-Including both weight and height, we get multicollinearity. Models explain only 15-22% of variation. Sex is partially confounded by height as including sex and body dimensions reduces effect of sex. Still, males eliminate alcohol slower than females. Taller people eliminate alcohol faster. 
+Including both weight and height, we get multicollinearity. Models explain only 15-22% of variation. Sex is partially confounded by height as including sex and body dimensions reduces effect of sex. Still, males eliminate alcohol slower than females. Taller people eliminate alcohol faster. In model 3, sex becomes statistically insignificant because we remove part of the sex effect.
 
 ```{r}
 # Boxplot
@@ -107,17 +107,18 @@ t.test(beta60 ~ sex, data=bac)
 cohens_d(beta60 ~ sex, data=bac)
 ```
 
-Effect size is large. CI is wide, but lower end is still small-medium effect.  
+Effect size is large. CI is wide, but lower end is still small-medium effect. 15% difference in elimination rates. T-test shows highly significant. 
 
+Practically, does not make sense to include height, and we avoid multicollinearity issues. Also avoids potential measurement errors.
 
 ```{r}
-set.seed(1)
-bootstrap <- function(d, idx) quantile(d$beta60[idx], 0.025, na.rm = TRUE)
-bootstrap_run <- boot(data = bac, statistic = bootstrap, R = 5000)
-beta_q025_ci <- quantile(bootstrap_run$t, c(0.025, 0.5, 0.975), na.rm = TRUE)
-names(beta_q025_ci) <- c("ci_low","point_estimate","ci_high")
-beta_q025_ci
+male_percentiles <- quantile(bac$beta60[bac$sex=="male"], c(0.025))
+female_percentiles <- quantile(bac$beta60[bac$sex=="female"], c(0.025))
+
+male_percentiles
+female_percentiles
 ```
 
-The bootstrap CI shows how much the 2.5 percentile moves from sampling noise. Here the interval is fairly tight, so the rule is not unstable on this sample.  
+Overall, Police Scotland's model is too conservative for males and too liberal for females, causing a systematic disadvantage for females. We recommend replacing the current protocol with calculating $C_o=C_t+\beta t$ using the 2.5th percentile separately for men and women. Specifically, $\beta = 0.125$ for male suspects and $\beta = 0.154$ for female suspects.
 
+(Maybe include somewhere why 2.5th percentile is a good decision point)
