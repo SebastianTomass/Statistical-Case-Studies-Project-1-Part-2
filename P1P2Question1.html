@@ -605,20 +605,23 @@ cohens_d(beta60 ~ sex, data=bac)</code></pre>
 <p>Effect size is large. CI is wide, but lower end is still small-medium
 effect. 15% difference in elimination rates. T-test shows highly
 significant.</p>
-<p>Practically, does not make sense to include height, and we avoid
-multicollinearity issues. Also avoids potential measurement errors.</p>
-<pre class="r"><code>male_percentiles &lt;- quantile(bac$beta60[bac$sex==&quot;male&quot;], c(0.025, 0.975))
-female_percentiles &lt;- quantile(bac$beta60[bac$sex==&quot;female&quot;], c(0.025, 0.975))
+<p>Practically, does not make sense to include height as we avoid
+multicollinearity issues and potential measurement errors.</p>
+<pre class="r"><code>male_percentiles &lt;- quantile(bac$beta60[bac$sex==&quot;male&quot;], c(0.025))
+female_percentiles &lt;- quantile(bac$beta60[bac$sex==&quot;female&quot;], c(0.025))
 
 male_percentiles</code></pre>
-<pre><code>##      2.5%     97.5% 
-## 0.1249298 0.2348313</code></pre>
+<pre><code>##      2.5% 
+## 0.1249298</code></pre>
 <pre class="r"><code>female_percentiles</code></pre>
-<pre><code>##      2.5%     97.5% 
-## 0.1543138 0.2598695</code></pre>
+<pre><code>##      2.5% 
+## 0.1543138</code></pre>
 <p>Overall, Police Scotland’s model is too conservative for males and
 too liberal for females, causing a systematic disadvantage for females.
-We recommend replacing the current protocol with Calculating <span class="math inline">\(C_o=C_t+\beta t\)</span></p>
+We recommend replacing the current protocol with calculating <span class="math inline">\(C_o=C_t+\beta t\)</span> using the 2.5th
+percentile separately for men and women. Specifically, <span class="math inline">\(\beta = 0.125\)</span> for male suspects and <span class="math inline">\(\beta = 0.154\)</span> for female suspects.</p>
+<p>(Maybe include somewhere why 2.5th percentile is a good decision
+point)</p>
 
 
 
