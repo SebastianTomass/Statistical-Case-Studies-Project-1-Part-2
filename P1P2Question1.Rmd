@@ -121,4 +121,22 @@ female_percentiles
 
 Overall, Police Scotland's model is too conservative for males and too liberal for females, causing a systematic disadvantage for females. We recommend replacing the current protocol with calculating $C_o=C_t+\beta t$ using the 2.5th percentile separately for men and women. Specifically, $\beta = 0.125$ for male suspects and $\beta = 0.154$ for female suspects.
 
-(Maybe include somewhere why 2.5th percentile is a good decision point)
+```{r}
+probs95   <- c(0.025, 0.975)
+probs9973 <- c(0.00135, 0.99865)
+
+bounds_emp <- bac %>%
+  filter(!is.na(beta), sex %in% c("female","male")) %>%
+  group_by(sex) %>%
+  summarise(
+    low95    = as.numeric(quantile(beta60, probs95[1],  na.rm = TRUE, names = FALSE)),
+    high95   = as.numeric(quantile(beta60, probs95[2],  na.rm = TRUE, names = FALSE)),
+    low9973  = as.numeric(quantile(beta60, probs9973[1], na.rm = TRUE, names = FALSE)),
+    high9973 = as.numeric(quantile(beta60, probs9973[2], na.rm = TRUE, names = FALSE)),
+    n = n(),
+    .groups = "drop"
+  )
+
+bounds_emp
+```
+`````
