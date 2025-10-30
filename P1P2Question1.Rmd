@@ -109,7 +109,7 @@ cohens_d(beta60 ~ sex, data=bac)
 
 Effect size is large. CI is wide, but lower end is still small-medium effect. 15% difference in elimination rates. T-test shows highly significant. 
 
-Practically, does not make sense to include height, and we avoid multicollinearity issues. Also avoids potential measurement errors.
+Practically, does not make sense to include height as we avoid multicollinearity issues and potential measurement errors.
 
 ```{r}
 male_percentiles <- quantile(bac$beta60[bac$sex=="male"], c(0.025))
