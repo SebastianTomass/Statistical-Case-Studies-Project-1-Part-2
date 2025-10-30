@@ -112,16 +112,6 @@ Effect size is large. CI is wide, but lower end is still small-medium effect. 15
 Practically, does not make sense to include height as we avoid multicollinearity issues and potential measurement errors.
 
 ```{r}
-male_percentiles <- quantile(bac$beta60[bac$sex=="male"], c(0.025))
-female_percentiles <- quantile(bac$beta60[bac$sex=="female"], c(0.025))
-
-male_percentiles
-female_percentiles
-```
-
-Overall, Police Scotland's model is too conservative for males and too liberal for females, causing a systematic disadvantage for females. We recommend replacing the current protocol with calculating $C_o=C_t+\beta t$ using the 2.5th percentile separately for men and women. Specifically, $\beta = 0.125$ for male suspects and $\beta = 0.154$ for female suspects.
-
-```{r}
 probs95   <- c(0.025, 0.975)
 probs9973 <- c(0.00135, 0.99865)
 
@@ -139,4 +129,5 @@ bounds_emp <- bac %>%
 
 bounds_emp
 ```
-`````
+
+Overall, Police Scotland's model is too conservative for males and too liberal for females, causing a systematic disadvantage for females. We recommend replacing the current protocol with calculating $C_o=C_t+\beta t$ using the 99.73% confidence intervals separate for men and females. EXPLAIN WHY
